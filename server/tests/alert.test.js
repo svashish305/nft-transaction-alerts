@@ -1,6 +1,4 @@
 import { promises as fs } from "fs";
-import path from "path";
-import { QueryTypes } from "sequelize";
 import { jest } from "@jest/globals";
 import db from "../util/database.js";
 
