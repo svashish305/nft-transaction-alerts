@@ -24,6 +24,7 @@ const getUserCache = async () => {
       const { id, email, role } = user;
       userInfoCache[id] = { email, role };
     });
+    console.log("allUsersData:-------------", allUsersData);
     return userInfoCache;
   } catch (error) {
     console.log("get user cache error: ", error);
@@ -62,7 +63,7 @@ const getInactiveSellers = async () => {
       { type: QueryTypes.SELECT }
     );
     usersWhoSoldNftsInLast7Days = usersWhoSoldNftsInLast7Days.map(
-      (record) => record.userid
+      (record) => record.sellerid
     );
     return usersWhoSoldNftsInLast7Days;
   } catch (error) {
@@ -107,7 +108,7 @@ export const getRuleAlertsMap = async () => {
     ) {
       const usersWhoBoughtFirstNft = await getFirstNftBuyers();
       usersWhoBoughtFirstNft.forEach((id) => {
-        const message = `Congrats ${userInfoCache[id].email}! You bought your first NFT!`;
+        const message = `Congrats ${userInfoCache?.[id]?.email}! You bought your first NFT!`;
         console.log(message);
         firstTypeAlerts.push(message);
       });
@@ -119,8 +120,8 @@ export const getRuleAlertsMap = async () => {
     ) {
       const usersWhoHaveNotSoldNftsInLast7Days = await getInactiveSellers();
       usersWhoHaveNotSoldNftsInLast7Days.forEach((id) => {
-        const message = `Hey ${userInfoCache[id].email}! You have not sold any NFTs in last 7 days!`;
-        console.log(message);
+        const message = `Hey ${userInfoCache?.[id]?.email}! You have not sold any NFTs in last 7 days!`;
+        console.log(id, message);
         secondTypeAlerts.push(message);
       });
     }
@@ -129,9 +130,10 @@ export const getRuleAlertsMap = async () => {
         "Alert operator if more than 100 NFTs are purchased by a user within an hour."
       )
     ) {
-      const usersWhoBoughtMoreThan100NftsInLastHour = await getHighVolumeBuyers();
+      const usersWhoBoughtMoreThan100NftsInLastHour =
+        await getHighVolumeBuyers();
       usersWhoBoughtMoreThan100NftsInLastHour.forEach((id) => {
-        const message = `Hey Operator! ${userInfoCache[id].email} has bought more than 100 NFTs in last hour!`;
+        const message = `Hey Operator! ${userInfoCache?.[id]?.email} has bought more than 100 NFTs in last hour!`;
         console.log(message);
         thirdTypeAlerts.push(message);
       });
@@ -145,4 +147,4 @@ export const getRuleAlertsMap = async () => {
     console.log("get rule alerts map error: ", error);
     throw error;
   }
-}
+};

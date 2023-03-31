@@ -37,7 +37,7 @@ app.listen(PORT, async () => {
   try {
     await sequelize.authenticate();
     console.log("Connection to DB has been established successfully.");
-    
+
     // ONE TIME ONLY: SEED THE DATABASE WWITH MOCK DATA
     const userCount = (await User.count()) || 0;
     if (!userCount) {
@@ -71,23 +71,23 @@ app.listen(PORT, async () => {
         };
         events.push(event);
       }
+
       // for (let i = 0; i < 101; i++) {
       //   const event = {
-      //     userid: 874,
+      //     userid: 513,
       //     verb: "buy",
       //     noun: "nft",
       //     timestamp: new Date( Date.now() - 60000 * 30),
       //     properties: {
-      //       merchangeid: 265,
+      //       merchangeid: 325,
       //       ...JSON.parse(faker.datatype.json()),
       //     },
       //   };
       //   events.push(event);
       // }
-      // const newEvents = await Event.bulkCreate(events);
 
-      const newEvents = await Event.bulkCreate(events);
-      console.log(`Created ${newEvents.length} events`);
+      // const newEvents = await Event.bulkCreate(events);
+      // console.log(`Created ${newEvents.length} events`);
     }
 
     console.log(`Server running on port: ${PORT}`);
