@@ -6,7 +6,7 @@ import db from "../util/database.js";
 const getRules = async () => {
   try {
     const data = await fs.readFile(path.resolve("./rules.txt"), "utf-8");
-    const rules = data.toString().split("\n");
+    const rules = data.toString().split("\n") || [];
     return rules;
   } catch (error) {
     console.log("get rules error: ", error);
@@ -24,7 +24,6 @@ const getUserCache = async () => {
       const { id, email, role } = user;
       userInfoCache[id] = { email, role };
     });
-    console.log("allUsersData:-------------", allUsersData);
     return userInfoCache;
   } catch (error) {
     console.log("get user cache error: ", error);
@@ -42,7 +41,7 @@ const getFirstNftBuyers = async () => {
         HAVING COUNT(*) = 1
       `,
       { type: QueryTypes.SELECT }
-    );
+    ) || [];
     usersWhoBoughtFirstNft = usersWhoBoughtFirstNft.map(
       (record) => record.userid
     );
@@ -61,7 +60,7 @@ const getInactiveSellers = async () => {
         WHERE verb = 'buy' AND noun = 'nft' GROUP BY sellerid HAVING MAX(timestamp) < (NOW() - interval '7 days')
       `,
       { type: QueryTypes.SELECT }
-    );
+    ) || [];
     usersWhoSoldNftsInLast7Days = usersWhoSoldNftsInLast7Days.map(
       (record) => record.sellerid
     );
@@ -82,7 +81,7 @@ const getHighVolumeBuyers = async () => {
         HAVING COUNT(*) > 100
       `,
       { type: QueryTypes.SELECT }
-    );
+    ) || [];
     usersWhoBoughtMoreThan100NftsInLastHour =
       usersWhoBoughtMoreThan100NftsInLastHour.map((record) => record.userid);
     return usersWhoBoughtMoreThan100NftsInLastHour;
@@ -107,11 +106,13 @@ export const getRuleAlertsMap = async () => {
       )
     ) {
       const usersWhoBoughtFirstNft = await getFirstNftBuyers();
-      usersWhoBoughtFirstNft.forEach((id) => {
-        const message = `Congrats ${userInfoCache?.[id]?.email}! You bought your first NFT!`;
-        console.log(message);
-        firstTypeAlerts.push(message);
-      });
+      if (usersWhoBoughtFirstNft?.length) {
+        usersWhoBoughtFirstNft.forEach((id) => {
+          const message = `Congrats ${userInfoCache?.[id]?.email}! You bought your first NFT!`;
+          console.log(message);
+          firstTypeAlerts.push(message);
+        });
+      }
     }
     if (
       rules.includes(
@@ -119,11 +120,13 @@ export const getRuleAlertsMap = async () => {
       )
     ) {
       const usersWhoHaveNotSoldNftsInLast7Days = await getInactiveSellers();
-      usersWhoHaveNotSoldNftsInLast7Days.forEach((id) => {
-        const message = `Hey ${userInfoCache?.[id]?.email}! You have not sold any NFTs in last 7 days!`;
-        console.log(id, message);
-        secondTypeAlerts.push(message);
-      });
+      if (usersWhoHaveNotSoldNftsInLast7Days?.length) {
+        usersWhoHaveNotSoldNftsInLast7Days.forEach((id) => {
+          const message = `Hey ${userInfoCache?.[id]?.email}! You have not sold any NFTs in last 7 days!`;
+          console.log(id, message);
+          secondTypeAlerts.push(message);
+        });
+      }
     }
     if (
       rules.includes(
@@ -132,11 +135,13 @@ export const getRuleAlertsMap = async () => {
     ) {
       const usersWhoBoughtMoreThan100NftsInLastHour =
         await getHighVolumeBuyers();
-      usersWhoBoughtMoreThan100NftsInLastHour.forEach((id) => {
-        const message = `Hey Operator! ${userInfoCache?.[id]?.email} has bought more than 100 NFTs in last hour!`;
-        console.log(message);
-        thirdTypeAlerts.push(message);
-      });
+      if (usersWhoBoughtMoreThan100NftsInLastHour?.length) {
+        usersWhoBoughtMoreThan100NftsInLastHour.forEach((id) => {
+          const message = `Hey Operator! ${userInfoCache?.[id]?.email} has bought more than 100 NFTs in last hour!`;
+          console.log(message);
+          thirdTypeAlerts.push(message);
+        });
+      }
     }
     ruleAlertsMap[rules[0]] = firstTypeAlerts;
     ruleAlertsMap[rules[1]] = secondTypeAlerts;
