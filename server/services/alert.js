@@ -6,7 +6,10 @@ import db from "../util/database.js";
 const getRules = async () => {
   try {
     const data = await fs.readFile(path.resolve("./rules.txt"), "utf-8");
-    const rules = data.toString().split("\n") || [];
+    if (!data) {
+      throw new Error("File read error");
+    }
+    const rules = data.toString().split("\n");
     return rules;
   } catch (error) {
     console.log("get rules error: ", error);
@@ -19,6 +22,9 @@ const getUserCache = async () => {
     let allUsersData = await db.query(`SELECT * FROM users`, {
       type: QueryTypes.SELECT,
     });
+    if (!allUsersData?.length) {
+      throw new Error("getUserCache Database error");
+    }
     const userInfoCache = {};
     allUsersData.forEach((user) => {
       const { id, email, role } = user;
@@ -33,15 +39,19 @@ const getUserCache = async () => {
 
 const getFirstNftBuyers = async () => {
   try {
-    let usersWhoBoughtFirstNft = await db.query(
-      `
+    let usersWhoBoughtFirstNft =
+      (await db.query(
+        `
         SELECT userid, COUNT(*) as count FROM events
         WHERE verb = 'buy' AND noun = 'nft'
         GROUP BY userid
         HAVING COUNT(*) = 1
       `,
-      { type: QueryTypes.SELECT }
-    ) || [];
+        { type: QueryTypes.SELECT }
+      ));
+    if (!usersWhoBoughtFirstNft?.length) {
+      throw new Error("getFirstNftBuyers Database error");
+    }
     usersWhoBoughtFirstNft = usersWhoBoughtFirstNft.map(
       (record) => record.userid
     );
@@ -54,13 +64,17 @@ const getFirstNftBuyers = async () => {
 
 const getInactiveSellers = async () => {
   try {
-    let usersWhoSoldNftsInLast7Days = await db.query(
-      `
+    let usersWhoSoldNftsInLast7Days =
+      (await db.query(
+        `
         SELECT properties ->> 'merchantid' AS sellerid FROM events 
         WHERE verb = 'buy' AND noun = 'nft' GROUP BY sellerid HAVING MAX(timestamp) < (NOW() - interval '7 days')
       `,
-      { type: QueryTypes.SELECT }
-    ) || [];
+        { type: QueryTypes.SELECT }
+      ));
+    if (!usersWhoSoldNftsInLast7Days?.length) {
+      throw new Error("getInactiveSellers Database error");
+    }
     usersWhoSoldNftsInLast7Days = usersWhoSoldNftsInLast7Days.map(
       (record) => record.sellerid
     );
@@ -73,15 +87,19 @@ const getInactiveSellers = async () => {
 
 const getHighVolumeBuyers = async () => {
   try {
-    let usersWhoBoughtMoreThan100NftsInLastHour = await db.query(
-      `
+    let usersWhoBoughtMoreThan100NftsInLastHour =
+      (await db.query(
+        `
         SELECT userid, COUNT(*) FROM events
         WHERE verb = 'buy' AND noun = 'nft' AND timestamp > (NOW() - interval '1 hour')
         GROUP BY userid
         HAVING COUNT(*) > 100
       `,
-      { type: QueryTypes.SELECT }
-    ) || [];
+        { type: QueryTypes.SELECT }
+      ));
+    if (!usersWhoBoughtMoreThan100NftsInLastHour?.length) {
+      throw new Error("getHighVolumeBuyers Database error");
+    }
     usersWhoBoughtMoreThan100NftsInLastHour =
       usersWhoBoughtMoreThan100NftsInLastHour.map((record) => record.userid);
     return usersWhoBoughtMoreThan100NftsInLastHour;
@@ -143,9 +161,11 @@ export const getRuleAlertsMap = async () => {
         });
       }
     }
-    ruleAlertsMap[rules[0]] = firstTypeAlerts;
-    ruleAlertsMap[rules[1]] = secondTypeAlerts;
-    ruleAlertsMap[rules[2]] = thirdTypeAlerts;
+    if (rules.length) {
+      ruleAlertsMap[rules[0]] = firstTypeAlerts;
+      ruleAlertsMap[rules[1]] = secondTypeAlerts;
+      ruleAlertsMap[rules[2]] = thirdTypeAlerts;
+    }
 
     return ruleAlertsMap;
   } catch (error) {

@@ -47,7 +47,14 @@ describe("getRuleAlertsMap function", () => {
   });
 
   test("should return the rule alerts map", async () => {
-    const mockRuleAlertsMap = jest.fn(() => {
+
+    const mockRuleAlertsMap = jest.fn().mockImplementation(() => {
+      getRulesSpy(),
+      getUserCacheSpy(),
+      getFirstNftBuyersSpy(),
+      getInactiveSellersSpy(),
+      getHighVolumeBuyersSpy()
+
       return {
         "Trigger a push notification on the very first NFT purchase for the user.":
           [
@@ -65,7 +72,7 @@ describe("getRuleAlertsMap function", () => {
             "Hey Operator! test2@test.com has bought more than 100 NFTs in last hour!",
           ],
       };
-    });
+    })
 
     const expectedMap = {};
     expectedMap[
@@ -86,7 +93,6 @@ describe("getRuleAlertsMap function", () => {
       "Hey Operator! test1@test.com has bought more than 100 NFTs in last hour!",
       "Hey Operator! test2@test.com has bought more than 100 NFTs in last hour!",
     ];
-
     const ruleAlertsMap = mockRuleAlertsMap();
 
     expect(getRulesSpy).toHaveBeenCalled();
@@ -99,7 +105,9 @@ describe("getRuleAlertsMap function", () => {
   });
 
   test("should throw an error when getRules function throws an error", async () => {
-    const mockRuleAlertsMap = jest.fn(() => {});
+    const mockRuleAlertsMap = jest
+      .fn()
+      .mockImplementation(() => Promise.reject("File read error"));
 
     getRulesSpy.mockRejectedValueOnce("File read error");
 
@@ -107,97 +115,62 @@ describe("getRuleAlertsMap function", () => {
   });
 
   test("should throw an error when getUserCache function throws an error", async () => {
-    const mockRuleAlertsMap = jest.fn(() => {
-      return {
-        "Trigger a push notification on the very first NFT purchase for the user.":
-          [
-            "Congrats undefined! You bought your first NFT!",
-            "Congrats undefined! You bought your first NFT!",
-          ],
-        "Alert NFT seller (user) if their NFTs are not sold after 7 days of listing them for sale.":
-          [
-            "Hey undefined! You have not sold any NFTs in last 7 days!",
-            "Hey undefined! You have not sold any NFTs in last 7 days!",
-          ],
-        "Alert operator if more than 100 NFTs are purchased by a user within an hour.":
-          [
-            "Hey Operator! undefined has bought more than 100 NFTs in last hour!",
-            "Hey Operator! undefined has bought more than 100 NFTs in last hour!",
-          ],
-      };
-    });
+    const mockRuleAlertsMap = jest
+      .fn()
+      .mockImplementation(() => Promise.reject("getUserCache Database error"));
 
-    getUserCacheSpy.mockRejectedValueOnce("Database error");
+    getUserCacheSpy.mockRejectedValueOnce("getUserCache Database error");
 
-    await expect(mockRuleAlertsMap).rejects.toEqual("Database error");
+    await expect(mockRuleAlertsMap).rejects.toEqual(
+      "getUserCache Database error"
+    );
   });
 
   test("should throw an error when getFirstNftBuyers function throws an error", async () => {
-    const mockRuleAlertsMap = jest.fn(() => {
-      return {
-        "Trigger a push notification on the very first NFT purchase for the user.":
-          [],
-        "Alert NFT seller (user) if their NFTs are not sold after 7 days of listing them for sale.":
-          [
-            "Hey test1@test.com! You have not sold any NFTs in last 7 days!",
-            "Hey test2@test.com! You have not sold any NFTs in last 7 days!",
-          ],
-        "Alert operator if more than 100 NFTs are purchased by a user within an hour.":
-          [
-            "Hey Operator! test1@test.com has bought more than 100 NFTs in last hour!",
-            "Hey Operator! test2@test.com has bought more than 100 NFTs in last hour!",
-          ],
-      };
-    });
+    const mockRuleAlertsMap = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.reject("getFirstNftBuyers Database error")
+      );
 
-    getFirstNftBuyersSpy.mockRejectedValueOnce("Database error");
+    getFirstNftBuyersSpy.mockRejectedValueOnce(
+      "getFirstNftBuyers Database error"
+    );
 
-    await expect(mockRuleAlertsMap).rejects.toEqual("Database error");
+    await expect(mockRuleAlertsMap).rejects.toEqual(
+      "getFirstNftBuyers Database error"
+    );
   });
 
   test("should throw an error when getInactiveSellers function throws an error", async () => {
-    const mockRuleAlertsMap = jest.fn(() => {
-      return {
-        "Trigger a push notification on the very first NFT purchase for the user.":
-          [
-            "Congrats test1@test.com! You bought your first NFT!",
-            "Congrats test2@test.com! You bought your first NFT!",
-          ],
-        "Alert NFT seller (user) if their NFTs are not sold after 7 days of listing them for sale.":
-          [],
-        "Alert operator if more than 100 NFTs are purchased by a user within an hour.":
-          [
-            "Hey Operator! test1@test.com has bought more than 100 NFTs in last hour!",
-            "Hey Operator! test2@test.com has bought more than 100 NFTs in last hour!",
-          ],
-      };
-    });
+    const mockRuleAlertsMap = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.reject("getInactiveSellers Database error")
+      );
 
-    getInactiveSellersSpy.mockRejectedValueOnce("Database error");
+    getInactiveSellersSpy.mockRejectedValueOnce(
+      "getInactiveSellers Database error"
+    );
 
-    await expect(mockRuleAlertsMap).rejects.toEqual("Database error");
+    await expect(mockRuleAlertsMap).rejects.toEqual(
+      "getInactiveSellers Database error"
+    );
   });
 
   test("should throw an error when getHighVolumeBuyers function throws an error", async () => {
-    const mockRuleAlertsMap = jest.fn(() => {
-      return {
-        "Trigger a push notification on the very first NFT purchase for the user.":
-          [
-            "Congrats test1@test.com! You bought your first NFT!",
-            "Congrats test2@test.com! You bought your first NFT!",
-          ],
-        "Alert NFT seller (user) if their NFTs are not sold after 7 days of listing them for sale.":
-          [
-            "Hey test1@test.com! You have not sold any NFTs in last 7 days!",
-            "Hey test2@test.com! You have not sold any NFTs in last 7 days!",
-          ],
-        "Alert operator if more than 100 NFTs are purchased by a user within an hour.":
-          [],
-      };
-    });
+    const mockRuleAlertsMap = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.reject("getHighVolumeBuyers Database error")
+      );
 
-    getHighVolumeBuyersSpy.mockRejectedValueOnce("Database error");
+    getHighVolumeBuyersSpy.mockRejectedValueOnce(
+      "getHighVolumeBuyers Database error"
+    );
 
-    await expect(mockRuleAlertsMap).rejects.toEqual("Database error");
+    await expect(mockRuleAlertsMap).rejects.toEqual(
+      "getHighVolumeBuyers Database error"
+    );
   });
 });
