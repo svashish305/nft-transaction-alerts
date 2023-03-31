@@ -36,7 +36,7 @@ const PORT = process.env.PORT || 9000;
 app.listen(PORT, async () => {
   try {
     await sequelize.authenticate();
-    console.log("Connection to DB has been established successfully.");
+    console.log("Connection to PostgreSQL DB has been established successfully.");
 
     // ONE TIME ONLY: SEED THE DATABASE WITH MOCK DATA
     const userCount = (await User.count()) || 0;
@@ -75,22 +75,25 @@ app.listen(PORT, async () => {
     }
 
     // uncomment below lines to generate mock data to pass final rule.
+    // firstly, pick any first userid from events table where verb is buy and noun is nft
     // const events = [];
-    // for (let i = 0; i < 101; i++) {
+    // const thresholdEventCount = 100;
+    // const halfHourAgoTimestamp = new Date(Date.now() - 60000 * 30);
+    // for (let i = 0; i < thresholdEventCount + 1; i++) {
     //   const event = {
-    //     userid: 513,
+    //     userid: 513, // our picked userid
     //     verb: "buy",
     //     noun: "nft",
-    //     timestamp: new Date( Date.now() - 60000 * 30),
+    //     timestamp: halfHourAgoTimestamp,
     //     properties: {
-    //       merchangeid: 325,
+    //       merchangeid: 325, // merchantid in properties of the picked event whose userid is 513
     //       ...JSON.parse(faker.datatype.json()),
     //     },
     //   };
     //   events.push(event);
     // }
-    // const newEvents = await Event.bulkCreate(events);
-    // console.log(`Created ${newEvents.length} events`);
+    const newEvents = await Event.bulkCreate(events);
+    console.log(`Created ${newEvents.length} events`);
 
     console.log(`Server running on port: ${PORT}`);
   } catch (error) {

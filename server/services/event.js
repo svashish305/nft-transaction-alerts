@@ -2,8 +2,7 @@ import Event from "../models/event.js";
 
 export const createEvent = async (params = {}) => {
   try {
-    const { userid, verb, noun, properties } = params;
-    const timestamp = new Date();
+    const { userid, verb, noun, timestamp, properties } = params;
     const event = await Event.create({
       userid,
       verb,
