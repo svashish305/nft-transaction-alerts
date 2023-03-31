@@ -1,12 +1,11 @@
-import { faker } from "@faker-js/faker";
-import Event from "../models/event.js";
+import { createEvent, getEvents } from "../services/event";
 
-export const createEvent = async (req, res) => {
+export const createEventController = async (req, res) => {
   try {
     const { body } = req;
     const { userid, verb, noun, properties } = body;
     const timestamp = new Date();
-    const newEvent = await Event.create({
+    const newEvent = await createEvent({
       userid,
       verb,
       noun,
@@ -20,49 +19,9 @@ export const createEvent = async (req, res) => {
   }
 };
 
-export const createEvents = async (req, res) => {
+export const getEventsController = async (req, res) => {
   try {
-    const events = [];
-    for (let i = 0; i < 1000; i++) {
-      const event = {
-        userid: faker.datatype.number({ min: 1, max: 1000 }),
-        verb: faker.helpers.arrayElement(["buy", "post"]),
-        noun: faker.helpers.arrayElement(["nft", "feedback"]),
-        timestamp: faker.date.recent(8),
-        properties: {
-          merchangeid: faker.datatype.number({ min: 1, max: 1000 }),
-          ...JSON.parse(faker.datatype.json()),
-        },
-      };
-      events.push(event);
-    }
-    const newEvents = await Event.bulkCreate(events);
-    res.status(201).json({ newEvents });
-
-    // const events = [];
-    // for (let i = 0; i < 101; i++) {
-    //   const event = {
-    //     userid: 874,
-    //     verb: "buy",
-    //     noun: "nft",
-    //     timestamp: new Date( Date.now() - 60000 * 30),
-    //     properties: {
-    //       merchangeid: 265,
-    //       ...JSON.parse(faker.datatype.json()),
-    //     },
-    //   };
-    //   events.push(event);
-    // }
-    // const newEvents = await Event.bulkCreate(events);
-    // res.status(201).json({ newEvents });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-export const getEvents = async (req, res) => {
-  try {
-    const allEvents = await Event.findAll();
+    const allEvents = await getEvents();
     res.status(200).json(allEvents);
   } catch (error) {
     res.status(400).json({ error: error.message });
