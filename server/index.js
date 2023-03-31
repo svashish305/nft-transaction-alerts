@@ -32,54 +32,63 @@ app.use("/event", eventRoutes);
 app.use("/alert", alertRoutes);
 
 const PORT = process.env.PORT || 9000;
+
 app.listen(PORT, async () => {
   try {
     await sequelize.authenticate();
     console.log("Connection to DB has been established successfully.");
+    
     // ONE TIME ONLY: SEED THE DATABASE WWITH MOCK DATA
-    const users = [];
-    for (let i = 0; i < 1000; i++) {
-      const user = {
-        name: faker.name.fullName(),
-        email: faker.internet.email().toLowerCase(),
-        role: faker.helpers.arrayElement(["operator", "user"]),
-      };
-      users.push(user);
-    }
-    const newUsers = await User.bulkCreate(users);
-    console.log(`Created ${newUsers.length} users`);
+    const userCount = (await User.count()) || 0;
+    if (!userCount) {
+      const users = [];
+      for (let i = 0; i < 1000; i++) {
+        const user = {
+          name: faker.name.fullName(),
+          email: faker.internet.email().toLowerCase(),
+          role: faker.helpers.arrayElement(["operator", "user"]),
+        };
+        users.push(user);
+      }
 
-    const events = [];
-    for (let i = 0; i < 1000; i++) {
-      const event = {
-        userid: faker.datatype.number({ min: 1, max: 1000 }),
-        verb: faker.helpers.arrayElement(["buy", "post"]),
-        noun: faker.helpers.arrayElement(["nft", "feedback"]),
-        timestamp: faker.date.recent(8),
-        properties: {
-          merchantid: faker.datatype.number({ min: 1, max: 1000 }),
-          ...JSON.parse(faker.datatype.json()),
-        },
-      };
-      events.push(event);
+      const newUsers = await User.bulkCreate(users);
+      console.log(`Created ${newUsers.length} users`);
     }
-    const newEvents = await Event.bulkCreate(events);
-    // const events = [];
-    // for (let i = 0; i < 101; i++) {
-    //   const event = {
-    //     userid: 874,
-    //     verb: "buy",
-    //     noun: "nft",
-    //     timestamp: new Date( Date.now() - 60000 * 30),
-    //     properties: {
-    //       merchangeid: 265,
-    //       ...JSON.parse(faker.datatype.json()),
-    //     },
-    //   };
-    //   events.push(event);
-    // }
-    // const newEvents = await Event.bulkCreate(events);
-    console.log(`Created ${newEvents.length} events`);
+
+    const eventCount = (await Event.count()) || 0;
+    if (!eventCount) {
+      const events = [];
+      for (let i = 0; i < 1000; i++) {
+        const event = {
+          userid: faker.datatype.number({ min: 1, max: 1000 }),
+          verb: faker.helpers.arrayElement(["buy", "post"]),
+          noun: faker.helpers.arrayElement(["nft", "feedback"]),
+          timestamp: faker.date.recent(8),
+          properties: {
+            merchantid: faker.datatype.number({ min: 1, max: 1000 }),
+            ...JSON.parse(faker.datatype.json()),
+          },
+        };
+        events.push(event);
+      }
+      // for (let i = 0; i < 101; i++) {
+      //   const event = {
+      //     userid: 874,
+      //     verb: "buy",
+      //     noun: "nft",
+      //     timestamp: new Date( Date.now() - 60000 * 30),
+      //     properties: {
+      //       merchangeid: 265,
+      //       ...JSON.parse(faker.datatype.json()),
+      //     },
+      //   };
+      //   events.push(event);
+      // }
+      // const newEvents = await Event.bulkCreate(events);
+
+      const newEvents = await Event.bulkCreate(events);
+      console.log(`Created ${newEvents.length} events`);
+    }
 
     console.log(`Server running on port: ${PORT}`);
   } catch (error) {

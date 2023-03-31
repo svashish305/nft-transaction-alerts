@@ -1,4 +1,4 @@
-import { createEvent, getEvents } from "../services/event";
+import { createEvent, getEvents } from "../services/event.js";
 
 export const createEventController = async (req, res) => {
   try {
