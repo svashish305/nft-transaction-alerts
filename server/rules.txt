@@ -1,0 +1,3 @@
+Trigger a push notification on the very first NFT purchase for the user.
+Alert NFT seller (user) if their NFTs are not sold after 7 days of listing them for sale.
+Alert operator if more than 100 NFTs are purchased by a user within an hour.
