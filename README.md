@@ -20,8 +20,8 @@ cd server
 npm i
 npm run dev
 ```
-DB gets seeded with mock data the first time server runs
-For passing the 3rd and final rule, commends added to comment/uncomment relavant code in index.js to seed db properly.
+DB gets seeded with mock data the first time server runs automatically as per code in index.js.
+For passing the 3rd and final rule, commends added to comment lines 59-75 & uncomment lines 78-93 in index.js to seed db properly.
 
 ## Test Instructions
 ```

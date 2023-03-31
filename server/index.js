@@ -38,7 +38,7 @@ app.listen(PORT, async () => {
     await sequelize.authenticate();
     console.log("Connection to DB has been established successfully.");
 
-    // ONE TIME ONLY: SEED THE DATABASE WWITH MOCK DATA
+    // ONE TIME ONLY: SEED THE DATABASE WITH MOCK DATA
     const userCount = (await User.count()) || 0;
     if (!userCount) {
       const users = [];
@@ -55,10 +55,10 @@ app.listen(PORT, async () => {
       console.log(`Created ${newUsers.length} users`);
     }
 
+    // comment below lines to generate mock data to pass final rule.
     const eventCount = (await Event.count()) || 0;
     if (!eventCount) {
       const events = [];
-      // comment below code snippet to generate mock data to pass final rule.
       for (let i = 0; i < 1000; i++) {
         const event = {
           userid: faker.datatype.number({ min: 1, max: 1000 }),
@@ -72,24 +72,25 @@ app.listen(PORT, async () => {
         };
         events.push(event);
       }
-
-      // uncomment below code snippet to generate mock data to pass final rule.
-      // for (let i = 0; i < 101; i++) {
-      //   const event = {
-      //     userid: 513,
-      //     verb: "buy",
-      //     noun: "nft",
-      //     timestamp: new Date( Date.now() - 60000 * 30),
-      //     properties: {
-      //       merchangeid: 325,
-      //       ...JSON.parse(faker.datatype.json()),
-      //     },
-      //   };
-      //   events.push(event);
-      // }
-      // const newEvents = await Event.bulkCreate(events);
-      // console.log(`Created ${newEvents.length} events`);
     }
+
+    // uncomment below lines to generate mock data to pass final rule.
+    // const events = [];
+    // for (let i = 0; i < 101; i++) {
+    //   const event = {
+    //     userid: 513,
+    //     verb: "buy",
+    //     noun: "nft",
+    //     timestamp: new Date( Date.now() - 60000 * 30),
+    //     properties: {
+    //       merchangeid: 325,
+    //       ...JSON.parse(faker.datatype.json()),
+    //     },
+    //   };
+    //   events.push(event);
+    // }
+    // const newEvents = await Event.bulkCreate(events);
+    // console.log(`Created ${newEvents.length} events`);
 
     console.log(`Server running on port: ${PORT}`);
   } catch (error) {
