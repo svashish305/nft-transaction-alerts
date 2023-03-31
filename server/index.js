@@ -58,6 +58,7 @@ app.listen(PORT, async () => {
     const eventCount = (await Event.count()) || 0;
     if (!eventCount) {
       const events = [];
+      // comment below code snippet to generate mock data to pass final rule.
       for (let i = 0; i < 1000; i++) {
         const event = {
           userid: faker.datatype.number({ min: 1, max: 1000 }),
@@ -72,6 +73,7 @@ app.listen(PORT, async () => {
         events.push(event);
       }
 
+      // uncomment below code snippet to generate mock data to pass final rule.
       // for (let i = 0; i < 101; i++) {
       //   const event = {
       //     userid: 513,
@@ -85,7 +87,6 @@ app.listen(PORT, async () => {
       //   };
       //   events.push(event);
       // }
-
       // const newEvents = await Event.bulkCreate(events);
       // console.log(`Created ${newEvents.length} events`);
     }

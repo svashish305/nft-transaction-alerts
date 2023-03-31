@@ -20,7 +20,8 @@ cd server
 npm i
 npm run dev
 ```
-To seed db with mock data, run the create users and events APIs respectively.
+DB gets seeded with mock data the first time server runs
+For passing the 3rd and final rule, commends added to comment/uncomment relavant code in index.js to seed db properly.
 
 ## Test Instructions
 ```
